@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("DATABASE_SHADOW_URL")
+  relationMode      = "prisma"
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  name  String
+
+  tasks Task[]
+}
+
+model Task {
+  id Int @id @default(autoincrement())
+
+  createdAt   DateTime @default(now())
+  title       String
+  description String
+  deadline    DateTime
+  status      String
+
+  userId Int
+  User   User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
