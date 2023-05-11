@@ -7,14 +7,14 @@ export interface User {
   tasks: Task[];
 }
 
-export interface Group {
-  id: number;
+// export interface Group {
+//   id: number;
 
-  name: string;
+//   name: string;
 
-  members: User[];
-  tasks: GroupTask[];
-}
+//   members: User[];
+//   tasks: GroupTask[];
+// }
 
 export interface Task {
   id: number;
@@ -26,17 +26,17 @@ export interface Task {
   status: "todo" | "doing" | "done";
 }
 
-export interface GroupTask {
-  id: number;
+// export interface GroupTask {
+//   id: number;
 
-  createdAt: string;
-  title: string;
-  description: string;
-  deadline: string;
-  status: "todo" | "doing" | "done";
+//   createdAt: string;
+//   title: string;
+//   description: string;
+//   deadline: string;
+//   status: "todo" | "doing" | "done";
 
-  members: User[];
-}
+//   members: User[];
+// }
 
 export const createUser = async ({
   name,

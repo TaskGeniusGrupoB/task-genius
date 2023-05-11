@@ -1,4 +1,35 @@
+import { GetServerSideProps } from "next";
 import Head from "next/head";
+
+import { cookieExists } from "@/lib/cookieExists";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const userCookie = cookieExists("user.token", context);
+
+  if (!!userCookie) {
+    return {
+      redirect: {
+        destination: "/home",
+        permanent: false,
+      },
+      props: {},
+    };
+  }
+
+  if (!userCookie) {
+    return {
+      redirect: {
+        destination: "/auth/login",
+        permanent: false,
+      },
+      props: {},
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
 
 export default function Home() {
   return (

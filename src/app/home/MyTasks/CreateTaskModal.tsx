@@ -20,9 +20,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 import axios from "axios";
 
-import { TSetColumns, getColumns } from ".";
+import { TSetColumns, getColumns } from "./utils/functions";
 
 import type { User } from "@/database/functions";
+import { Textarea } from "@/components/Textarea";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -75,7 +76,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       date,
     });
 
-    setColumns(getColumns(newUser.tasks));
+    setColumns(getColumns({ tasks: newUser.tasks }));
 
     onClose();
   };
@@ -105,9 +106,9 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 error={errors.title}
               />
 
-              <Input
+              <Textarea
+                h={40}
                 placeholder="Descrição da tarefa"
-                leftIconSrc="/icons/Description.svg"
                 {...register("description")}
                 error={errors.description}
               />
