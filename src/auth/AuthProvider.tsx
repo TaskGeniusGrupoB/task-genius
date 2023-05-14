@@ -1,4 +1,10 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { useRouter } from "next/router";
 
@@ -35,6 +41,7 @@ type sendPasswordResetEmailProps = Pick<User, "email">;
 export interface AuthContextModel {
   auth: Auth;
   user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
 
   signUp: ({ email, name, password }: signUpProps) => Promise<UserCredential>;
   signIn: ({ email, password }: signInProps) => Promise<UserCredential>;
@@ -63,8 +70,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       recover({ email: userCookie }).then((response) => {
         if (!response) return;
 
-        const { id, email, name, tasks } = response;
-        setUser({ id, email, name, tasks });
+        const { id, email, name, tasks, member } = response;
+        setUser({ id, email, name, tasks, member });
       });
     }
   }, []);
@@ -131,6 +138,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const values: AuthContextModel = {
     user,
+    setUser,
     signIn,
     signUp,
     signOut,

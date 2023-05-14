@@ -8,7 +8,6 @@ import { theme } from "@/styles/theme";
 /*
 // Alterações
 //
-// [ ] No modal de criação de tarefa, substituir input de descrição por textarea
 // [ ] Botão de editar tarefa
 // [ ] implementar Notificações
 //

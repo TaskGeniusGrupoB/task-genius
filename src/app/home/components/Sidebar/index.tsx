@@ -1,16 +1,11 @@
 import React from "react";
 
 import { useRouter } from "next/router";
-import NextLink from "next/link";
 
 import {
-  Circle,
   HStack,
   VStack,
   Text,
-  Image,
-  Icon,
-  Link,
   IconButton,
   useDisclosure,
   Button,
@@ -21,77 +16,9 @@ import { AddGroupModal } from "./AddGroupModal";
 import { CreateGroupModal } from "./CreateGroupModal";
 
 import { Logo } from "@/components/Logo";
+import { NavLink, GroupLink } from "./Components";
 
-interface NavLinkProps {
-  iconSrc: string;
-  href: string;
-  children: React.ReactNode;
-}
-
-const NavLink = ({ children, iconSrc, href }: NavLinkProps) => {
-  const MyIcon = () => <Image src={iconSrc} />;
-
-  return (
-    <NextLink href={href}>
-      <HStack
-        as={Link}
-        spacing={4}
-        _hover={{ cursor: "pointer", opacity: "0.9", textDecoration: "none" }}
-      >
-        <Icon as={MyIcon} />
-
-        <Text
-          fontSize={["sm", "md", "lg", "lg"]}
-          fontWeight="500"
-          display={["none", "none", "flex", "flex"]}
-        >
-          {children}
-        </Text>
-      </HStack>
-    </NextLink>
-  );
-};
-
-interface GroupLinkProps {
-  index: number;
-  id: number;
-  isActive: boolean;
-  children: React.ReactNode;
-}
-
-const GroupLink = ({ index, id, isActive, children }: GroupLinkProps) => {
-  const colors = ["#0047FF", "#2DCD5B", "#B92CEB", "#6AD0E2"];
-  const color = colors[(index as number) % colors.length];
-
-  return (
-    <NextLink passHref href={`/home/group/${id}`}>
-      <HStack
-        key={index}
-        as={Link}
-        w="100%"
-        px={4}
-        py={2}
-        spacing={4}
-        bgColor={isActive ? "#0047FF14" : "none"}
-        _hover={{
-          cursor: "pointer",
-          bgColor: "#0047FF14",
-          textDecoration: "none",
-        }}
-      >
-        <Circle size={2} bgColor={color} />
-
-        <Text
-          fontSize="sm"
-          fontWeight="500"
-          display={["none", "none", "flex", "flex"]}
-        >
-          {children}
-        </Text>
-      </HStack>
-    </NextLink>
-  );
-};
+import { useAuth } from "@/hooks/useAuth";
 
 const userGroups = [
   {
@@ -114,6 +41,11 @@ const userGroups = [
 
 export const Sidebar: React.FC = () => {
   const router = useRouter();
+
+  const { user } = useAuth();
+  console.log("Sidebar", { user });
+  console.log("Sidebar", { member: user?.member });
+  console.log("Sidebar", { group: user?.member[0].group });
 
   const {
     isOpen: addGroupModalIsOpen,
@@ -175,14 +107,14 @@ export const Sidebar: React.FC = () => {
           </HStack>
 
           <VStack align="start" px={2} spacing={2}>
-            {userGroups.map((group, index) => {
+            {user?.member.map((member, index) => {
               return (
                 <GroupLink
                   index={index}
-                  id={group.id}
-                  isActive={router.query.group === group.id.toString()}
+                  id={member.group.id}
+                  isActive={router.query.group === member.group.id.toString()}
                 >
-                  {group.name}
+                  {member.group.name}
                 </GroupLink>
               );
             })}

@@ -40,14 +40,29 @@ export const CreateGroupModal: React.FC<CreateTaskModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
   const { errors } = formState;
 
-  const onSubmit: SubmitHandler<FormData> = async ({}) => {
+  const onSubmit: SubmitHandler<FormData> = async ({ name }) => {
+    const { data } = await axios.post("/api/res/createGroup", {
+      userId: user!.id,
+      name,
+    });
+    const { group, groupMember } = data;
+
+    const _user = { ...user! };
+    setUser({ ..._user, member: [...user!.member, groupMember] });
+
+    console.log(`CreateGroupModal`, {
+      ..._user,
+      member: [...user!.member, groupMember,],
+    });
+    console.log(`CreateGroupModal`, { groups: _user.member[0].group });
+
     onClose();
   };
 

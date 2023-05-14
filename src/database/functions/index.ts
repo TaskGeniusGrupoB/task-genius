@@ -4,17 +4,10 @@ export interface User {
   id: number;
   email: string;
   name: string;
+
   tasks: Task[];
+  member: GroupMember[];
 }
-
-// export interface Group {
-//   id: number;
-
-//   name: string;
-
-//   members: User[];
-//   tasks: GroupTask[];
-// }
 
 export interface Task {
   id: number;
@@ -24,6 +17,22 @@ export interface Task {
   description: string;
   deadline: string;
   status: "todo" | "doing" | "done";
+}
+
+export interface Group {
+  id: number;
+
+  name: string;
+  members: User[];
+  // tasks: GroupTask[];
+}
+
+export interface GroupMember {
+  user: User;
+  group: Group;
+
+  userId: number;
+  groupId: number;
 }
 
 // export interface GroupTask {
@@ -42,15 +51,10 @@ export const createUser = async ({
   name,
   email,
 }: Pick<User, "name" | "email">): Promise<User> => {
-  const tasks = [] as Task[];
-
   const user = await prisma.user.create({
     data: {
       name,
       email,
-      tasks: {
-        create: tasks,
-      },
     },
   });
 
@@ -66,35 +70,42 @@ export const getUserByEmail = async ({
     },
     include: {
       tasks: true,
+      member: {
+        include: {
+          group: true,
+        },
+      },
     },
   });
 
   return user;
 };
 
-// export const createGroup = async (
-//   creatorUser: User,
-//   name: string
-// ): Promise<Group> => {
-//   const tasks: GroupTask[] = [];
+export const createGroup = async (userId: number, name: string) => {
+  const group = await prisma.group.create({
+    data: {
+      name,
+    },
+  });
 
-//   const group = await prisma.group.create({
-//     data: {
-//       name,
-//       members: {
-//         connect: { id: creatorUser.id },
-//       },
-//       tasks: {
-//         create: tasks,
-//       },
-//     },
-//     include: {
-//       members: true,
-//     },
-//   });
+  const groupMember = await addGroupMember(userId, group.id);
 
-//   return group;
-// };
+  return { group, groupMember };
+};
+
+export const addGroupMember = async (userId: number, groupId: number) => {
+  const groupMember = await prisma.groupMember.create({
+    data: {
+      userId,
+      groupId,
+    },
+    include: {
+      group: true,
+    },
+  });
+
+  return groupMember;
+};
 
 export const addTask = async ({
   id,

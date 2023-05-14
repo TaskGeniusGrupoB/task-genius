@@ -14,7 +14,8 @@ model User {
   email String @unique
   name  String
 
-  tasks Task[]
+  tasks  Task[]
+  member GroupMember[]
 }
 
 model Task {
@@ -31,4 +32,23 @@ model Task {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model Group {
+  id Int @id @default(autoincrement())
+
+  name    String
+  members GroupMember[]
+}
+
+model GroupMember {
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+
+  userId  Int
+  groupId Int
+
+  @@id([userId, groupId])
+  @@index([userId])
+  @@index([groupId])
 }
