@@ -52,16 +52,10 @@ export const CreateGroupModal: React.FC<CreateTaskModalProps> = ({
       userId: user!.id,
       name,
     });
-    const { group, groupMember } = data;
+    const { groupMember } = data;
 
     const _user = { ...user! };
-    setUser({ ..._user, member: [...user!.member, groupMember] });
-
-    console.log(`CreateGroupModal`, {
-      ..._user,
-      member: [...user!.member, groupMember,],
-    });
-    console.log(`CreateGroupModal`, { groups: _user.member[0].group });
+    setUser({ ..._user, member: [..._user.member, groupMember] });
 
     onClose();
   };

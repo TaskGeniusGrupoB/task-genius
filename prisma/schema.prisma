@@ -35,11 +35,30 @@ model Task {
 }
 
 model Group {
-  id Int @id @default(autoincrement())
+  id Int @id @unique @default(autoincrement())
 
+  userId  Int
   name    String
   members GroupMember[]
+
+  // tasks GroupTask[]
 }
+
+// model GroupTask {
+//   id Int @id @unique @default(autoincrement())
+
+//   createdAt   String
+//   title       String
+//   description String
+//   deadline    String
+//   status      String
+
+//   members User[]
+//   Group   Group? @relation(fields: [groupId], references: [id])
+//   groupId Int?
+
+//   @@index([groupId])
+// }
 
 model GroupMember {
   user  User  @relation(fields: [userId], references: [id])

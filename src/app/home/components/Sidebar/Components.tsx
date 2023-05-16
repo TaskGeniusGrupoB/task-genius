@@ -49,7 +49,7 @@ export const GroupLink = ({
   const color = colors[(index as number) % colors.length];
 
   return (
-    <NextLink passHref href={`/home/group/${id}`}>
+    <NextLink passHref href={`/home/group/${index}`}>
       <HStack
         key={index}
         as={Link}

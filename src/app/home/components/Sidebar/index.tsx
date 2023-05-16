@@ -20,32 +20,10 @@ import { NavLink, GroupLink } from "./Components";
 
 import { useAuth } from "@/hooks/useAuth";
 
-const userGroups = [
-  {
-    id: 1,
-    name: "Química",
-  },
-  {
-    id: 2,
-    name: "Física",
-  },
-  {
-    id: 3,
-    name: "Cálculo II",
-  },
-  {
-    id: 4,
-    name: "TaskGenius",
-  },
-];
-
 export const Sidebar: React.FC = () => {
   const router = useRouter();
 
   const { user } = useAuth();
-  console.log("Sidebar", { user });
-  console.log("Sidebar", { member: user?.member });
-  console.log("Sidebar", { group: user?.member[0].group });
 
   const {
     isOpen: addGroupModalIsOpen,
@@ -107,17 +85,19 @@ export const Sidebar: React.FC = () => {
           </HStack>
 
           <VStack align="start" px={2} spacing={2}>
-            {user?.member.map((member, index) => {
-              return (
-                <GroupLink
-                  index={index}
-                  id={member.group.id}
-                  isActive={router.query.group === member.group.id.toString()}
-                >
-                  {member.group.name}
-                </GroupLink>
-              );
-            })}
+            {user &&
+              user.member &&
+              user.member.map((member, index) => {
+                return (
+                  <GroupLink
+                    index={index}
+                    id={member.group.id}
+                    isActive={router.query.group === index.toString()}
+                  >
+                    {member.group.name}
+                  </GroupLink>
+                );
+              })}
 
             <Button
               w="100%"

@@ -1,5 +1,8 @@
 import { prisma } from "../prisma";
 
+// rodar prisma generate
+// criar funções de integração de group tasks
+
 export interface User {
   id: number;
   email: string;
@@ -22,9 +25,10 @@ export interface Task {
 export interface Group {
   id: number;
 
+  userId: number;
   name: string;
   members: User[];
-  // tasks: GroupTask[];
+  tasks: GroupTask[];
 }
 
 export interface GroupMember {
@@ -35,17 +39,17 @@ export interface GroupMember {
   groupId: number;
 }
 
-// export interface GroupTask {
-//   id: number;
+export interface GroupTask {
+  id: number;
 
-//   createdAt: string;
-//   title: string;
-//   description: string;
-//   deadline: string;
-//   status: "todo" | "doing" | "done";
+  createdAt: string;
+  title: string;
+  description: string;
+  deadline: string;
+  status: "todo" | "doing" | "done";
 
-//   members: User[];
-// }
+  members: User[];
+}
 
 export const createUser = async ({
   name,
@@ -72,7 +76,11 @@ export const getUserByEmail = async ({
       tasks: true,
       member: {
         include: {
-          group: true,
+          group: {
+            include: {
+              members: true,
+            },
+          },
         },
       },
     },
@@ -85,6 +93,7 @@ export const createGroup = async (userId: number, name: string) => {
   const group = await prisma.group.create({
     data: {
       name,
+      userId,
     },
   });
 
@@ -94,17 +103,33 @@ export const createGroup = async (userId: number, name: string) => {
 };
 
 export const addGroupMember = async (userId: number, groupId: number) => {
-  const groupMember = await prisma.groupMember.create({
-    data: {
-      userId,
-      groupId,
-    },
-    include: {
-      group: true,
+  const group = await prisma.group.findUnique({
+    where: {
+      id: groupId,
     },
   });
 
-  return groupMember;
+  if (!group) return null;
+
+  try {
+    const groupMember = await prisma.groupMember.create({
+      data: {
+        userId,
+        groupId,
+      },
+      include: {
+        group: {
+          include: {
+            members: true,
+          },
+        },
+      },
+    });
+
+    return groupMember;
+  } catch (err) {
+    return null;
+  }
 };
 
 export const addTask = async ({

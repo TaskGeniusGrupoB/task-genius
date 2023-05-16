@@ -37,6 +37,8 @@ export const Group = () => {
   const router = useRouter();
   const { group } = router.query;
 
+  if (typeof group !== "string") return;
+
   if (!user) return <LoadPage />;
 
   const initialColumns = getColumns({ tasks: user.tasks });
@@ -50,6 +52,8 @@ export const Group = () => {
     [columns]
   );
 
+  const Group = user.member[Number(group)].group;
+
   return (
     <Page title="Minhas Tarefas">
       <VStack
@@ -62,10 +66,21 @@ export const Group = () => {
       >
         <VStack w="100%" spacing={12} align="start">
           <VStack w="100%" spacing={4} align="start">
-            <VStack spacing={4} align="start">
-              <Heading color="blue.100" fontSize="4xl" fontWeight="700">
-                Todas as tarefas
-              </Heading>
+            <VStack w="100%" spacing={4} align="start">
+              <HStack w="100%" align="center" justify="space-between">
+                <Heading color="blue.100" fontSize="4xl" fontWeight="700">
+                  Todas as tarefas
+                </Heading>
+
+                {user.id === Group.userId && (
+                  <Text color="blue.100" fontSize="xl" fontWeight="600">
+                    Código:{" "}
+                    <Text as="span" fontWeight="400" fontSize="lg">
+                      {Group.id + 1000}
+                    </Text>
+                  </Text>
+                )}
+              </HStack>
               {oldestDate && newestDate && (
                 <Text color="gray.200" fontSize="sm" fontWeight="500">
                   {oldestDate} - {newestDate}
@@ -76,9 +91,10 @@ export const Group = () => {
             <VStack w="100%" spacing={4}>
               <HStack w="100%" align="center" justify="space-between">
                 <HStack spacing={2}>
-                  {[1, 2, 3].map((member, index) => {
-                    return <PersonIcon index={index} />;
-                  })}
+                  {Group.members &&
+                    Group.members.map((member, index) => {
+                      return <PersonIcon index={index} />;
+                    })}
                 </HStack>
 
                 <HStack

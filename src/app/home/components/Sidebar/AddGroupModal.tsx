@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 
 import {
   Modal,
@@ -8,6 +8,8 @@ import {
   ModalBody,
   VStack,
   Button,
+  ToastId,
+  useToast,
 } from "@chakra-ui/react";
 
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -26,25 +28,49 @@ interface CreateTaskModalProps {
 }
 
 type FormData = {
-  code: string;
+  code: number;
 };
 
 const validationSchema = yup.object().shape({
-  code: yup.string().required("O campo código é obrigatório."),
+  code: yup.number().required("O campo código é obrigatório."),
 });
 
 export const AddGroupModal: React.FC<CreateTaskModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
+
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
 
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
   const { errors } = formState;
 
-  const onSubmit: SubmitHandler<FormData> = async ({}) => {
+  const onSubmit: SubmitHandler<FormData> = async ({ code }) => {
+    const { data } = await axios.post("/api/res/addGroupMember", {
+      userId: user!.id,
+      groupId: code - 1000,
+    });
+
+    const { groupMember } = data;
+
+    if (!groupMember) {
+      toastIdRef.current = toast({
+        title: "Código inválido",
+        description: "Verifique seu código e tente novamente.",
+        status: "error",
+        duration: 4000,
+      });
+
+      return;
+    }
+
+    const _user = { ...user! };
+    setUser({ ..._user, member: [..._user.member, groupMember] });
+
     onClose();
   };
 
