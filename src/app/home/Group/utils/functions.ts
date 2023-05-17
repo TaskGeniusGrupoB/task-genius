@@ -5,24 +5,24 @@ import axios from "axios";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-import type { Task } from "@/database/functions";
-
 import type { DropResult } from "react-beautiful-dnd";
 
-export const getColumns = ({ tasks }: { tasks: Task[] }) => {
+import type { GroupTask } from "@/database/functions";
+
+export const getColumns = ({ tasks }: { tasks: GroupTask[] }) => {
   if (!tasks) {
     return {
       "0": {
         name: "A Fazer",
-        tasks: [] as Task[],
+        tasks: [] as GroupTask[],
       },
       "1": {
         name: "Fazendo",
-        tasks: [] as Task[],
+        tasks: [] as GroupTask[],
       },
       "2": {
         name: "Feito",
-        tasks: [] as Task[],
+        tasks: [] as GroupTask[],
       },
     };
   }
@@ -53,7 +53,7 @@ export type TSetColumns = Dispatch<SetStateAction<TColumns>>;
 
 export const onDragEnd = (
   result: DropResult,
-  userId: number,
+  groupId: number,
   columns: TColumns,
   setColumns: TSetColumns
 ) => {
@@ -116,7 +116,7 @@ export const onDragEnd = (
     ...newColumns[2].tasks,
   ];
 
-  axios.post("/api/res/updateTasks", { userId, tasks });
+  axios.post("/api/res/updateGroupTask", { groupId, tasks });
 };
 
 export const getProgress = (columns: TColumns) => {

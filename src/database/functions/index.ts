@@ -42,6 +42,9 @@ export interface GroupMember {
 export interface GroupTask {
   id: number;
 
+  group: Group;
+  groupId: number;
+
   createdAt: string;
   title: string;
   description: string;
@@ -62,7 +65,7 @@ export const createUser = async ({
     },
   });
 
-  return user;
+  return user as unknown as User;
 };
 
 export const getUserByEmail = async ({
@@ -79,6 +82,7 @@ export const getUserByEmail = async ({
           group: {
             include: {
               members: true,
+              tasks: true,
             },
           },
         },
@@ -86,7 +90,7 @@ export const getUserByEmail = async ({
     },
   });
 
-  return user;
+  return user as unknown as User;
 };
 
 export const createGroup = async (userId: number, name: string) => {
@@ -160,18 +164,16 @@ export const addTask = async ({
     },
   });
 
-  return user;
+  return user as unknown as User;
 };
-
-interface updateTasks {
-  userId: number;
-  tasks: Task[];
-}
 
 export const updateTasks = async ({
   userId,
   tasks,
-}: updateTasks): Promise<void> => {
+}: {
+  userId: number;
+  tasks: Task[];
+}): Promise<void> => {
   await prisma.task.deleteMany({
     where: {
       userId,
@@ -197,4 +199,79 @@ export const deleteTaskById = async (taskId: number) => {
   });
 
   return deletedTask;
+};
+
+export const addGroupTask = async ({
+  groupId,
+  title,
+  description,
+  deadline,
+}: {
+  groupId: number;
+  title: string;
+  description: string;
+  deadline: string;
+}): Promise<GroupTask | null> => {
+  const status = "todo";
+
+  const group = await prisma.group.update({
+    where: {
+      id: groupId,
+    },
+    data: {
+      tasks: {
+        create: {
+          title,
+          description,
+          deadline,
+          status,
+        },
+      },
+    },
+    include: {
+      tasks: true,
+    },
+  });
+
+  return group as unknown as GroupTask;
+};
+
+export const updateGroupTasks = async ({
+  groupId,
+  tasks,
+}: {
+  groupId: number;
+  tasks: GroupTask[];
+}): Promise<void> => {
+  await prisma.groupTask.deleteMany({
+    where: {
+      groupId,
+    },
+  });
+
+  const createTasks = tasks.map((task) => ({
+    ...task,
+    groupId,
+  }));
+
+  await prisma.groupTask.createMany({
+    data: createTasks,
+    skipDuplicates: true,
+  });
+};
+
+export const deleteGroupTaskById = async (
+  taskId: number
+): Promise<GroupTask | null> => {
+  const deletedTask = await prisma.groupTask.delete({
+    where: {
+      id: taskId,
+    },
+    include: {
+      group: true,
+      members: true,
+    },
+  });
+
+  return deletedTask as unknown as GroupTask;
 };

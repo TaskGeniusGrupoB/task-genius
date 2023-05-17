@@ -18,7 +18,7 @@ import { TaskModal } from "./TaskModal";
 import { format } from "date-fns";
 
 import type { Task } from "@/database/functions";
-import type { TSetColumns } from ".";
+import type { TSetColumns } from "./utils/functions";
 
 interface CardProps {
   index: number;
@@ -114,6 +114,7 @@ interface TasksCardProps {
     tasks: Task[];
   };
   setColumns: TSetColumns;
+  groupId: number;
 }
 
 export const TasksCard: React.FC<TasksCardProps> = ({
@@ -121,6 +122,7 @@ export const TasksCard: React.FC<TasksCardProps> = ({
   columnId,
   column,
   setColumns,
+  groupId,
 }) => {
   const {
     isOpen: createTaskModalIsOpen,
@@ -207,6 +209,7 @@ export const TasksCard: React.FC<TasksCardProps> = ({
         isOpen={createTaskModalIsOpen}
         onClose={createTaskModalOnClose}
         setColumns={setColumns}
+        groupId={groupId}
       />
     </>
   );

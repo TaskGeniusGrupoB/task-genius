@@ -23,12 +23,13 @@ import axios from "axios";
 
 import { TSetColumns, getColumns } from "./utils/functions";
 
-import type { User } from "@/database/functions";
+import type { Group } from "@/database/functions";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   setColumns: TSetColumns;
+  groupId: number;
 }
 
 type FormData = {
@@ -54,9 +55,8 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   isOpen,
   onClose,
   setColumns,
+  groupId,
 }) => {
-  const { user } = useAuth();
-
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
@@ -68,15 +68,15 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     date,
   }) => {
     const {
-      data: { user: newUser },
-    }: { data: { user: User } } = await axios.post("/api/res/createTask", {
-      id: user!.id,
+      data: { group: newGroup },
+    }: { data: { group: Group } } = await axios.post("/api/res/addGroupTask", {
+      groupId,
       title,
       description,
-      date,
+      deadline: date,
     });
 
-    setColumns(getColumns({ tasks: newUser.tasks }));
+    setColumns(getColumns({ tasks: newGroup.tasks }));
 
     onClose();
   };

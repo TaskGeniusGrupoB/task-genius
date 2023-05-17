@@ -26,6 +26,7 @@ import {
   getTimeline,
   onDragEnd,
 } from "./utils/functions";
+import { GroupTask } from "@/database/functions";
 
 const PersonIcon = ({ index }: { index: number }) => {
   return <Image key={index} src="/icons/Person.png" h={8} />;
@@ -41,8 +42,13 @@ export const Group = () => {
 
   if (!user) return <LoadPage />;
 
-  const initialColumns = getColumns({ tasks: user.tasks });
-  // user.groups[group].tasks
+  const Group = user.member[Number(group)].group;
+
+  console.log("Group.tsx > ", Group);
+  const initialTasks = Group.tasks || [];
+  const initialColumns = getColumns({
+    tasks: initialTasks,
+  });
 
   const [columns, setColumns] = useState(initialColumns);
 
@@ -51,8 +57,6 @@ export const Group = () => {
     () => getTimeline(columns),
     [columns]
   );
-
-  const Group = user.member[Number(group)].group;
 
   return (
     <Page title="Minhas Tarefas">
@@ -122,7 +126,7 @@ export const Group = () => {
 
           <DragDropContext
             onDragEnd={(result) =>
-              onDragEnd(result, user.id, columns, setColumns)
+              onDragEnd(result, Group.id, columns, setColumns)
             }
           >
             <HStack w="100%" spacing={8} align="start" justify="space-between">
@@ -139,6 +143,7 @@ export const Group = () => {
                     column={column}
                     columnId={columnId}
                     setColumns={setColumns}
+                    groupId={Group.id}
                   />
                 );
               })}

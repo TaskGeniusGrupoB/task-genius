@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     setUser(user);
 
-    router.push("/home");
+    await router.push("/home");
 
     return userCredential;
   }
@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     setUser(user!);
 
-    router.push("/home");
+    await router.push("/home");
 
     return userCredential;
   }
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     setUser(null);
 
-    router.push("/auth/login");
+    await router.push("/auth/login");
   }
 
   async function sendPasswordResetEmail({

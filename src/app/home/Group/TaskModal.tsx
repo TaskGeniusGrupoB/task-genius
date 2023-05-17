@@ -20,8 +20,8 @@ import { format } from "date-fns";
 
 import { useAuth } from "@/hooks/useAuth";
 
-import type { TSetColumns } from ".";
 import axios from "axios";
+import type { TSetColumns } from "./utils/functions";
 
 interface TaskModalProps {
   task: Task;
@@ -62,7 +62,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         },
       };
 
-      axios.post("/api/res/deleteTask", { taskId: task.id + 1 });
+      axios.post("/api/res/deleteGroupTask", { taskId: task.id + 1 });
 
       return newColumns;
     });
