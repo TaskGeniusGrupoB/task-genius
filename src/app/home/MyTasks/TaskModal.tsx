@@ -20,8 +20,8 @@ import { format } from "date-fns";
 
 import { useAuth } from "@/hooks/useAuth";
 
-import type { TSetColumns } from ".";
 import axios from "axios";
+import { TSetColumns } from "./utils/functions";
 
 interface TaskModalProps {
   task: Task;

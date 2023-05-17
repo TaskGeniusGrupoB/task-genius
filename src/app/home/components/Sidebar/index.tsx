@@ -90,6 +90,7 @@ export const Sidebar: React.FC = () => {
               user.member.map((member, index) => {
                 return (
                   <GroupLink
+                    key={index}
                     index={index}
                     id={member.group.id}
                     isActive={router.query.group === index.toString()}

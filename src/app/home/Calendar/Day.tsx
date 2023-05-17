@@ -33,7 +33,7 @@ export const Day = ({ children, day, tasks }: DayProps) => {
         {tasks &&
           tasks.length &&
           tasks.map((task, index) => {
-            return <DayTask task={task} index={index} />;
+            return <DayTask key={index} task={task} index={index} />;
           })}
       </VStack>
     </VStack>

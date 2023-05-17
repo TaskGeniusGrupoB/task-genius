@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 
 import {
   VStack,
@@ -18,7 +18,7 @@ import { TaskModal } from "./TaskModal";
 import { format } from "date-fns";
 
 import type { Task } from "@/database/functions";
-import type { TSetColumns } from ".";
+import { TSetColumns } from "./utils/functions";
 
 interface CardProps {
   index: number;
@@ -166,6 +166,7 @@ export const TasksCard: React.FC<TasksCardProps> = ({
                 ({ id, title, description, createdAt, deadline }, index) => {
                   return (
                     <Card
+                      key={index}
                       index={index}
                       id={id - 1}
                       title={title}

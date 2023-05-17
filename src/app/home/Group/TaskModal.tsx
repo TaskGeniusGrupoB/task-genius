@@ -15,16 +15,14 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-import type { Task } from "@/database/functions";
+import type { GroupTask } from "@/database/functions";
 import { format } from "date-fns";
-
-import { useAuth } from "@/hooks/useAuth";
 
 import axios from "axios";
 import type { TSetColumns } from "./utils/functions";
 
 interface TaskModalProps {
-  task: Task;
+  task: GroupTask;
   isOpen: boolean;
   onClose: () => void;
   setColumns: TSetColumns;
@@ -36,8 +34,6 @@ export const TaskModal: React.FC<TaskModalProps> = ({
   onClose,
   setColumns,
 }) => {
-  const { user } = useAuth();
-
   const handleExcludeTask = () => {
     setColumns((prev) => {
       const tasks = Object.entries(prev)
@@ -126,13 +122,18 @@ export const TaskModal: React.FC<TaskModalProps> = ({
                 participantes
               </Text>
 
-              <HStack spacing={2}>
-                <Circle size="5px" bgColor="gray.100" />
+              {task.members &&
+                task.members.map((member, index) => {
+                  return (
+                    <HStack spacing={2} key={index}>
+                      <Circle size="5px" bgColor="gray.100" />
 
-                <Text color="gray.100" fontWeight="400" fontSize="md">
-                  {user!.name}
-                </Text>
-              </HStack>
+                      <Text color="gray.100" fontWeight="400" fontSize="md">
+                        {member.name}
+                      </Text>
+                    </HStack>
+                  );
+                })}
             </VStack>
           </VStack>
         </ModalBody>

@@ -17,7 +17,7 @@ import { TaskModal } from "./TaskModal";
 
 import { format } from "date-fns";
 
-import type { Task } from "@/database/functions";
+import type { Group, GroupTask, Task, User } from "@/database/functions";
 import type { TSetColumns } from "./utils/functions";
 
 interface CardProps {
@@ -28,6 +28,8 @@ interface CardProps {
   createdAt: string;
   deadline: string;
   status: "todo" | "doing" | "done";
+  group: Group;
+  members: User[];
   setColumns: TSetColumns;
 }
 
@@ -39,6 +41,8 @@ const Card = ({
   createdAt,
   deadline,
   status,
+  members,
+  group,
   setColumns,
 }: CardProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -97,7 +101,17 @@ const Card = ({
       </Draggable>
 
       <TaskModal
-        task={{ id, title, description, deadline, createdAt, status }}
+        task={{
+          id,
+          title,
+          description,
+          deadline,
+          createdAt,
+          status,
+          group,
+          groupId: group.id,
+          members,
+        }}
         isOpen={isOpen}
         onClose={onClose}
         setColumns={setColumns}
@@ -111,10 +125,10 @@ interface TasksCardProps {
   type: "todo" | "doing" | "done";
   column: {
     name: string;
-    tasks: Task[];
+    tasks: GroupTask[];
   };
   setColumns: TSetColumns;
-  groupId: number;
+  group: Group;
 }
 
 export const TasksCard: React.FC<TasksCardProps> = ({
@@ -122,7 +136,7 @@ export const TasksCard: React.FC<TasksCardProps> = ({
   columnId,
   column,
   setColumns,
-  groupId,
+  group,
 }) => {
   const {
     isOpen: createTaskModalIsOpen,
@@ -165,9 +179,13 @@ export const TasksCard: React.FC<TasksCardProps> = ({
               {...provided.droppableProps}
             >
               {column.tasks.map(
-                ({ id, title, description, createdAt, deadline }, index) => {
+                (
+                  { id, title, description, createdAt, deadline, members },
+                  index
+                ) => {
                   return (
                     <Card
+                      key={index}
                       index={index}
                       id={id - 1}
                       title={title}
@@ -175,6 +193,8 @@ export const TasksCard: React.FC<TasksCardProps> = ({
                       createdAt={createdAt}
                       deadline={deadline}
                       status={type}
+                      group={group}
+                      members={members}
                       setColumns={setColumns}
                     />
                   );
@@ -209,7 +229,7 @@ export const TasksCard: React.FC<TasksCardProps> = ({
         isOpen={createTaskModalIsOpen}
         onClose={createTaskModalOnClose}
         setColumns={setColumns}
-        groupId={groupId}
+        group={group}
       />
     </>
   );

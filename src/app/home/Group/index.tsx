@@ -1,4 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { useRouter } from "next/router";
 
@@ -26,7 +32,6 @@ import {
   getTimeline,
   onDragEnd,
 } from "./utils/functions";
-import { GroupTask } from "@/database/functions";
 
 const PersonIcon = ({ index }: { index: number }) => {
   return <Image key={index} src="/icons/Person.png" h={8} />;
@@ -36,27 +41,27 @@ export const Group = () => {
   const { user } = useAuth();
 
   const router = useRouter();
-  const { group } = router.query;
+  let { group } = router.query;
 
-  if (typeof group !== "string") return;
+  if (typeof group !== "string") group = group?.toString();
+
+  const [columns, setColumns] = useState<ReturnType<typeof getColumns>>();
+
+  useEffect(() => {
+    if (!!user) {
+      const initialColumns = getColumns({
+        tasks: user.member[Number(group)].group.tasks,
+      });
+      setColumns(initialColumns);
+    }
+  }, [user]);
 
   if (!user) return <LoadPage />;
 
-  const Group = user.member[Number(group)].group;
-
-  console.log("Group.tsx > ", Group);
-  const initialTasks = Group.tasks || [];
-  const initialColumns = getColumns({
-    tasks: initialTasks,
-  });
-
-  const [columns, setColumns] = useState(initialColumns);
-
-  const progress = useMemo(() => getProgress(columns), [columns]);
-  const { oldestDate, newestDate } = useMemo(
-    () => getTimeline(columns),
-    [columns]
-  );
+  const progress = columns ? getProgress(columns) : null;
+  const { oldestDate, newestDate } = columns
+    ? getTimeline(columns)
+    : { oldestDate: "", newestDate: "" };
 
   return (
     <Page title="Minhas Tarefas">
@@ -76,11 +81,11 @@ export const Group = () => {
                   Todas as tarefas
                 </Heading>
 
-                {user.id === Group.userId && (
+                {user.id === user.member[Number(group)].group.userId && (
                   <Text color="blue.100" fontSize="xl" fontWeight="600">
                     Código:{" "}
                     <Text as="span" fontWeight="400" fontSize="lg">
-                      {Group.id + 1000}
+                      {user.member[Number(group)].group.id + 1000}
                     </Text>
                   </Text>
                 )}
@@ -95,10 +100,12 @@ export const Group = () => {
             <VStack w="100%" spacing={4}>
               <HStack w="100%" align="center" justify="space-between">
                 <HStack spacing={2}>
-                  {Group.members &&
-                    Group.members.map((member, index) => {
-                      return <PersonIcon index={index} />;
-                    })}
+                  {user.member[Number(group)].group.members &&
+                    user.member[Number(group)].group.members.map(
+                      (member, index) => {
+                        return <PersonIcon key={index} index={index} />;
+                      }
+                    )}
                 </HStack>
 
                 <HStack
@@ -126,11 +133,18 @@ export const Group = () => {
 
           <DragDropContext
             onDragEnd={(result) =>
-              onDragEnd(result, Group.id, columns, setColumns)
+              onDragEnd(
+                result,
+                user.member[Number(group)].group.id,
+                columns!,
+                setColumns as Dispatch<
+                  SetStateAction<ReturnType<typeof getColumns>>
+                >
+              )
             }
           >
             <HStack w="100%" spacing={8} align="start" justify="space-between">
-              {Object.entries(columns).map(([columnId, column], index) => {
+              {Object.entries(columns!).map(([columnId, column], index) => {
                 return (
                   <TasksCard
                     key={columnId}
@@ -142,8 +156,12 @@ export const Group = () => {
                     }
                     column={column}
                     columnId={columnId}
-                    setColumns={setColumns}
-                    groupId={Group.id}
+                    setColumns={
+                      setColumns as Dispatch<
+                        SetStateAction<ReturnType<typeof getColumns>>
+                      >
+                    }
+                    group={user.member[Number(group)].group}
                   />
                 );
               })}

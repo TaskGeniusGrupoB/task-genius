@@ -7,9 +7,15 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { groupId, title, description, deadline } = req.body;
+    const { groupId, title, description, deadline, members } = req.body;
 
-    const group = await addGroupTask({ groupId, title, description, deadline });
+    const group = await addGroupTask({
+      groupId,
+      title,
+      description,
+      deadline,
+      members,
+    });
 
     return res.status(200).json({ group });
   }

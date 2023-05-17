@@ -27,7 +27,7 @@ export interface Group {
 
   userId: number;
   name: string;
-  members: User[];
+  members: GroupMember[];
   tasks: GroupTask[];
 }
 
@@ -81,8 +81,17 @@ export const getUserByEmail = async ({
         include: {
           group: {
             include: {
-              members: true,
-              tasks: true,
+              members: {
+                include: {
+                  user: true,
+                },
+              },
+              tasks: {
+                include: {
+                  members: true,
+                  group: true,
+                },
+              },
             },
           },
         },
@@ -206,12 +215,14 @@ export const addGroupTask = async ({
   title,
   description,
   deadline,
+  members,
 }: {
   groupId: number;
   title: string;
   description: string;
   deadline: string;
-}): Promise<GroupTask | null> => {
+  members: User[];
+}): Promise<Group | null> => {
   const status = "todo";
 
   const group = await prisma.group.update({
@@ -225,6 +236,9 @@ export const addGroupTask = async ({
           description,
           deadline,
           status,
+          members: {
+            connect: members.map((user) => ({ id: user.id })),
+          },
         },
       },
     },
@@ -233,7 +247,7 @@ export const addGroupTask = async ({
     },
   });
 
-  return group as unknown as GroupTask;
+  return group as unknown as Group;
 };
 
 export const updateGroupTasks = async ({
@@ -252,6 +266,7 @@ export const updateGroupTasks = async ({
   const createTasks = tasks.map((task) => ({
     ...task,
     groupId,
+    group: undefined,
   }));
 
   await prisma.groupTask.createMany({

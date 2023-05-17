@@ -24,7 +24,7 @@ const InputBase: ForwardRefRenderFunction<HTMLInputElement, InputProps> = (
   { name, placeholder, leftIconSrc, error, ...rest }: InputProps,
   ref
 ) => {
-  const IconSvg = () => <Image src={leftIconSrc} />;
+  const IconSvg = () => <Image alt="icon" src={leftIconSrc} />;
 
   return (
     <FormControl isInvalid={!!error}>

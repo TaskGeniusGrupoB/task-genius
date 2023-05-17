@@ -5,7 +5,7 @@ import { HStack, Heading, Image } from "@chakra-ui/react";
 export const Logo: React.FC = () => {
   return (
     <HStack spacing={[2, 2, 4, 4]}>
-      <Image src="/logo/logo.png" />
+      <Image alt="logo" src="/logo/logo.png" />
 
       <Heading
         fontSize={["lg", "lg", "xl", "2xl"]}

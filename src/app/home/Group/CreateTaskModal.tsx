@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Modal,
@@ -8,6 +8,9 @@ import {
   ModalBody,
   VStack,
   Button,
+  SimpleGrid,
+  Text,
+  Checkbox,
 } from "@chakra-ui/react";
 
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -17,19 +20,17 @@ import * as yup from "yup";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 
-import { useAuth } from "@/hooks/useAuth";
-
 import axios from "axios";
 
 import { TSetColumns, getColumns } from "./utils/functions";
 
-import type { Group } from "@/database/functions";
+import type { Group, User } from "@/database/functions";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   setColumns: TSetColumns;
-  groupId: number;
+  group: Group;
 }
 
 type FormData = {
@@ -55,25 +56,35 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   isOpen,
   onClose,
   setColumns,
-  groupId,
+  group,
 }) => {
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
   const { errors } = formState;
 
+  const [checkedMembers, setCheckedMembers] = useState<boolean[]>(
+    new Array(group.members.length).fill(false)
+  );
+
   const onSubmit: SubmitHandler<FormData> = async ({
     title,
     description,
     date,
   }) => {
+    let members = checkedMembers.map((checked, index) => {
+      if (checked) return group.members[index].user;
+    });
+    members = members.filter((val) => val) as User[];
+
     const {
       data: { group: newGroup },
     }: { data: { group: Group } } = await axios.post("/api/res/addGroupTask", {
-      groupId,
+      groupId: group.id,
       title,
       description,
       deadline: date,
+      members,
     });
 
     setColumns(getColumns({ tasks: newGroup.tasks }));
@@ -121,6 +132,31 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                 error={errors.date}
               />
             </VStack>
+
+            <Text color="black" fontSize="md" fontWeight="500">
+              Membros responsáveis
+            </Text>
+            <SimpleGrid w="100%" columns={3}>
+              {group.members.map((member, index) => {
+                return (
+                  <Checkbox
+                    key={index}
+                    isChecked={checkedMembers[index]}
+                    onChange={(e) =>
+                      setCheckedMembers((prev) => {
+                        return [
+                          ...prev.slice(0, index),
+                          e.target.checked,
+                          ...prev.slice(index + 1, prev.length),
+                        ];
+                      })
+                    }
+                  >
+                    {member.user.name}
+                  </Checkbox>
+                );
+              })}
+            </SimpleGrid>
 
             <Button
               type="submit"

@@ -12,7 +12,7 @@ export const LoadPage: React.FC = () => {
   return (
     <VStack w="100vw" h="100vh" align="center" justify="center" spacing={4}>
       <HStack spacing={4}>
-        <Image src="/logo/logo.png" />
+        <Image alt="logo" src="/logo/logo.png" />
 
         <Heading fontSize="2xl" color="#0D0F43" fontWeight="700">
           TaskGenius

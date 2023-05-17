@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { useAuth } from "@/hooks/useAuth";
 
@@ -21,17 +21,21 @@ import {
 export const MyTasks = () => {
   const { user } = useAuth();
 
+  const [columns, setColumns] = useState<ReturnType<typeof getColumns>>();
+
+  useEffect(() => {
+    if (!!user) {
+      const initialColumns = getColumns({ tasks: user.tasks });
+      setColumns(initialColumns);
+    }
+  }, [user]);
+
   if (!user) return <LoadPage />;
 
-  const initialColumns = getColumns({ tasks: user.tasks });
-
-  const [columns, setColumns] = useState(initialColumns);
-
-  const progress = useMemo(() => getProgress(columns), [columns]);
-  const { oldestDate, newestDate } = useMemo(
-    () => getTimeline(columns),
-    [columns]
-  );
+  const progress = columns && getProgress(columns);
+  const { oldestDate, newestDate } = columns
+    ? getTimeline(columns)
+    : { oldestDate: "", newestDate: "" };
 
   return (
     <Page title="Minhas Tarefas">
@@ -81,26 +85,38 @@ export const MyTasks = () => {
 
           <DragDropContext
             onDragEnd={(result) =>
-              onDragEnd(result, user.id, columns, setColumns)
+              onDragEnd(
+                result,
+                user.id,
+                columns!,
+                setColumns as Dispatch<
+                  SetStateAction<ReturnType<typeof getColumns>>
+                >
+              )
             }
           >
             <HStack w="100%" spacing={8} align="start" justify="space-between">
-              {Object.entries(columns).map(([columnId, column], index) => {
-                return (
-                  <TasksCard
-                    key={columnId}
-                    type={
-                      ["todo", "doing", "done"][index] as
-                        | "todo"
-                        | "doing"
-                        | "done"
-                    }
-                    column={column}
-                    columnId={columnId}
-                    setColumns={setColumns}
-                  />
-                );
-              })}
+              {columns &&
+                Object.entries(columns).map(([columnId, column], index) => {
+                  return (
+                    <TasksCard
+                      key={columnId}
+                      type={
+                        ["todo", "doing", "done"][index] as
+                          | "todo"
+                          | "doing"
+                          | "done"
+                      }
+                      column={column}
+                      columnId={columnId}
+                      setColumns={
+                        setColumns as Dispatch<
+                          SetStateAction<ReturnType<typeof getColumns>>
+                        >
+                      }
+                    />
+                  );
+                })}
             </HStack>
           </DragDropContext>
         </VStack>

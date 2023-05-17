@@ -46,14 +46,14 @@ function groupTasksByDay(tasks: Task[]): Record<string, Task[]> {
 export const Calendar: React.FC = () => {
   const { user } = useAuth();
 
-  if (!user) return <LoadPage />;
-
-  const tasks = useMemo(() => groupTasksByDay(user.tasks), [user.tasks]);
-
   const [month, setMonth] = useState([
     new Date().getMonth(),
     new Date().getFullYear(),
   ]);
+
+  if (!user) return <LoadPage />;
+
+  const tasks = groupTasksByDay(user.tasks);
 
   const handleChangeMonth = (plus: boolean) => {
     setMonth((prev) => {
@@ -65,7 +65,7 @@ export const Calendar: React.FC = () => {
     });
   };
 
-  const days = useMemo(() => getDatesInMonth(month[1], month[0]), [month]);
+  const days = getDatesInMonth(month[1], month[0]);
 
   return (
     <Page title="Calendário">
@@ -111,7 +111,7 @@ export const Calendar: React.FC = () => {
         >
           {days.map((day) => {
             return (
-              <Day day={day} tasks={tasks[day]}>
+              <Day key={day} day={day} tasks={tasks[day]}>
                 {getDayFromDate(day)}
               </Day>
             );
