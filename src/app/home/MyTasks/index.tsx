@@ -2,7 +2,14 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { useAuth } from "@/hooks/useAuth";
 
-import { VStack, Heading, HStack, Progress, Text } from "@chakra-ui/react";
+import {
+  VStack,
+  Heading,
+  HStack,
+  Progress,
+  Text,
+  Stack,
+} from "@chakra-ui/react";
 
 import { Page } from "../components/Page";
 import { TasksCard } from "./TaskCard";
@@ -94,7 +101,13 @@ export const MyTasks = () => {
               )
             }
           >
-            <HStack w="100%" spacing={8} align="start" justify="space-between">
+            <Stack
+              direction={["column", "column", "row", "row"]}
+              w="100%"
+              spacing={8}
+              align="start"
+              justify="space-between"
+            >
               {columns &&
                 Object.entries(columns).map(([columnId, column], index) => {
                   return (
@@ -116,7 +129,7 @@ export const MyTasks = () => {
                     />
                   );
                 })}
-            </HStack>
+            </Stack>
           </DragDropContext>
         </VStack>
       </VStack>

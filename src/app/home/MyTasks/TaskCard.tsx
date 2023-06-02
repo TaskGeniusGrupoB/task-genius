@@ -136,7 +136,12 @@ export const TasksCard: React.FC<TasksCardProps> = ({
 
   return (
     <>
-      <VStack w="33%" spacing={2} align="start" key={columnId}>
+      <VStack
+        w={["100%", "100%", "33%", "33%"]}
+        spacing={2}
+        align="start"
+        key={columnId}
+      >
         <Text color="blue.100" fontSize="xl" fontWeight="500">
           {
             {

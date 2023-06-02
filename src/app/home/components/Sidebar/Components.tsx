@@ -65,11 +65,7 @@ export const GroupLink = ({
       >
         <Circle size={2} bgColor={color} />
 
-        <Text
-          fontSize="sm"
-          fontWeight="500"
-          display={["none", "none", "flex", "flex"]}
-        >
+        <Text fontSize="sm" fontWeight="500">
           {children}
         </Text>
       </HStack>

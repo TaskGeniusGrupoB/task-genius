@@ -40,13 +40,14 @@ export const Sidebar: React.FC = () => {
   return (
     <>
       <VStack
-        w="20%"
+        w="100%"
+        maxW="fit-content"
         h="100%"
         minH="100vh"
         p={6}
         spacing={8}
         justify="start"
-        align={["center", "center", "start", "start"]}
+        align={["center", "center", "center", "center"]}
         bg="primary"
         color="#5A5B80"
       >
