@@ -25,6 +25,7 @@ import { recover } from "./recover";
 import { useCookies } from "@/hooks/useCookies";
 
 import type { User } from "@/database/functions";
+import type { Notification } from "@/app/home/components/Header";
 
 interface AuthProviderProps {
   children?: React.ReactNode;
@@ -42,6 +43,9 @@ export interface AuthContextModel {
   auth: Auth;
   user: User | null;
   setUser: Dispatch<SetStateAction<User | null>>;
+
+  notifications: Notification[];
+  setNotifications: Dispatch<SetStateAction<Notification[]>>;
 
   signUp: ({ email, name, password }: signUpProps) => Promise<UserCredential>;
   signIn: ({ email, password }: signInProps) => Promise<UserCredential>;
@@ -62,6 +66,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { readCookie, createCookie, deleteCookie } = useCookies();
 
   const [user, setUser] = useState<User | null>(null);
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
     const userCookie = readCookie("user.token");
@@ -139,6 +145,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const values: AuthContextModel = {
     user,
     setUser,
+    notifications,
+    setNotifications,
     signIn,
     signUp,
     signOut,

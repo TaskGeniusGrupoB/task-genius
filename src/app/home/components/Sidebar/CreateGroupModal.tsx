@@ -40,7 +40,7 @@ export const CreateGroupModal: React.FC<CreateTaskModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, setNotifications } = useAuth();
 
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
@@ -56,6 +56,14 @@ export const CreateGroupModal: React.FC<CreateTaskModalProps> = ({
 
     const _user = { ...user! };
     setUser({ ..._user, member: [..._user.member, groupMember] });
+
+    setNotifications((prev) => [
+      ...prev,
+      {
+        type: "created-group",
+        msg: name,
+      },
+    ]);
 
     onClose();
   };

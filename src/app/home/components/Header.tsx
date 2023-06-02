@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   HStack,
@@ -11,16 +11,50 @@ import {
   MenuButton,
   MenuItem as ChakraMenuItem,
   MenuList,
+  Circle,
 } from "@chakra-ui/react";
 
 import { useAuth } from "@/hooks/useAuth";
+
+import type { Task } from "@/database/functions";
+
+const getDeadlineNotifications = (_tasks: Task[]): Notification[] => {
+  const tasks = _tasks.filter(({ deadline }) => {
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 3);
+    const dateDeadline = new Date(deadline);
+
+    return dateDeadline.getTime() <= maxDate.getTime();
+  });
+
+  const deadlineNotifications = tasks.map(({ title }) => {
+    return {
+      type: "deadline",
+      msg: title,
+    } as Notification;
+  });
+
+  return deadlineNotifications;
+};
 
 interface HeaderProps {
   title: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({ title }) => {
-  const { user } = useAuth();
+  const { user, notifications } = useAuth();
+
+  const [_notifications, setNotifications] = useState<Notification[]>();
+
+  useEffect(() => {
+    if (user && notifications) {
+      setNotifications([
+        ...notifications,
+        ...getDeadlineNotifications(user.tasks),
+      ]);
+    }
+  }, [user, notifications]);
 
   return (
     <HStack
@@ -36,7 +70,9 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         {title}
       </Heading>
 
-      <HStack spacing={8} align="center">
+      <HStack spacing={4} align="center">
+        {_notifications && <NotificationsMenu notifications={_notifications} />}
+
         <HStack spacing={4}>
           <Image src="/icons/Person.png" />
 
@@ -93,12 +129,83 @@ const Menu = () => {
         _hover={{ bgColor: "white.100" }}
         _active={{ bgColor: "white.100" }}
       />
+
       <MenuList bgColor="white" border="solid 1px" borderColor="white.100">
         <VStack px={4} spacing={0} color="#C6C6C7">
           <MenuItem iconSrc="/icons/Logout.svg" onClick={signOut}>
             Sair
           </MenuItem>
         </VStack>
+      </MenuList>
+    </ChakraMenu>
+  );
+};
+
+const messages = {
+  "new-group": (group: string) => `Você ingressou no grupo: ${group}`,
+  "created-group": (group: string) => `Grupo criado com sucesso! ${group}`,
+  deadline: (task: string) => `Cuidado! Este prazo se aproxima: ${task}`,
+  "task-created": (task: string) => `Tarefa criada com sucesso! ${task}`,
+};
+
+interface NotificationItemProps {
+  type: keyof typeof messages;
+  msg: string;
+}
+
+const NotificationItem = ({ type, msg }: NotificationItemProps) => {
+  return (
+    <ChakraMenuItem
+      bgColor="#EBF1FF"
+      _hover={{}}
+      _active={{}}
+      py={4}
+      borderBottom="solid 1px"
+      borderBottomColor="#CDD7EC"
+      _last={{ borderBottom: "none" }}
+    >
+      <HStack w="100%" spacing={6}>
+        <Circle bgColor="#F52828" size={2} />
+        <Text color="blue.100" fontSize="sm" noOfLines={2}>
+          {messages[type](msg)}
+        </Text>
+      </HStack>
+    </ChakraMenuItem>
+  );
+};
+
+export type Notification = {
+  type: keyof typeof messages;
+  msg: string;
+};
+
+interface NotificationsMenuProps {
+  notifications: Notification[];
+}
+
+const NotificationsMenu = ({ notifications }: NotificationsMenuProps) => {
+  return (
+    <ChakraMenu>
+      <MenuButton
+        as={IconButton}
+        icon={<Image src="/icons/Email.png" />}
+        borderRadius="lg"
+        border="none"
+        bgColor="#EBF1FF"
+        aria-label="menu"
+        _hover={{ bgColor: "#EBF1FF" }}
+        _active={{ bgColor: "#EBF1FF" }}
+      />
+
+      <MenuList
+        bgColor="#EBF1FF"
+        border="solid 1px"
+        borderColor="white.100"
+        px={4}
+      >
+        {notifications.map(({ type, msg }, index) => {
+          return <NotificationItem type={type} msg={msg} key={index} />;
+        })}
       </MenuList>
     </ChakraMenu>
   );

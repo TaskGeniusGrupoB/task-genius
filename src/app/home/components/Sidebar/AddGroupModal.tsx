@@ -39,7 +39,7 @@ export const AddGroupModal: React.FC<CreateTaskModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, setNotifications } = useAuth();
 
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
@@ -70,6 +70,14 @@ export const AddGroupModal: React.FC<CreateTaskModalProps> = ({
 
     const _user = { ...user! };
     setUser({ ..._user, member: [..._user.member, groupMember] });
+
+    setNotifications((prev) => [
+      ...prev,
+      {
+        type: "new-group",
+        msg: groupMember.group.name,
+      },
+    ]);
 
     onClose();
   };

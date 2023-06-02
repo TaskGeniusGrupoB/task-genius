@@ -25,6 +25,7 @@ import axios from "axios";
 import { TSetColumns, getColumns } from "./utils/functions";
 
 import type { Group, User } from "@/database/functions";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -58,6 +59,8 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   setColumns,
   group,
 }) => {
+  const { setNotifications } = useAuth();
+
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
@@ -75,10 +78,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     let members = checkedMembers.map((checked, index) => {
       if (checked) return group.members[index].user;
     });
-    console.log("CreateTaskModal");
-    console.log(members);
     members = members.filter((val) => val) as User[];
-    console.log(members);
 
     const {
       data: { group: newGroup },
@@ -91,6 +91,13 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     });
 
     setColumns(getColumns({ tasks: newGroup.tasks }));
+    setNotifications((prev) => [
+      ...prev,
+      {
+        type: "task-created",
+        msg: title,
+      },
+    ]);
 
     onClose();
   };

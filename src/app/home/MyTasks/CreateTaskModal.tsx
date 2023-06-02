@@ -55,7 +55,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   setColumns,
 }) => {
-  const { user } = useAuth();
+  const { user, setNotifications } = useAuth();
 
   const { register, handleSubmit, formState } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
@@ -77,6 +77,13 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     });
 
     setColumns(getColumns({ tasks: newUser.tasks }));
+    setNotifications((prev) => [
+      ...prev,
+      {
+        type: "task-created",
+        msg: title,
+      },
+    ]);
 
     onClose();
   };
