@@ -54,7 +54,7 @@ export const Group = () => {
       });
       setColumns(initialColumns);
     }
-  }, [user]);
+  }, [user, group]);
 
   if (!user) return <LoadPage />;
 
@@ -144,27 +144,28 @@ export const Group = () => {
             }
           >
             <HStack w="100%" spacing={8} align="start" justify="space-between">
-              {Object.entries(columns!).map(([columnId, column], index) => {
-                return (
-                  <TasksCard
-                    key={columnId}
-                    type={
-                      ["todo", "doing", "done"][index] as
-                        | "todo"
-                        | "doing"
-                        | "done"
-                    }
-                    column={column}
-                    columnId={columnId}
-                    setColumns={
-                      setColumns as Dispatch<
-                        SetStateAction<ReturnType<typeof getColumns>>
-                      >
-                    }
-                    group={user.member[Number(group)].group}
-                  />
-                );
-              })}
+              {columns &&
+                Object.entries(columns).map(([columnId, column], index) => {
+                  return (
+                    <TasksCard
+                      key={columnId}
+                      type={
+                        ["todo", "doing", "done"][index] as
+                          | "todo"
+                          | "doing"
+                          | "done"
+                      }
+                      column={column}
+                      columnId={columnId}
+                      setColumns={
+                        setColumns as Dispatch<
+                          SetStateAction<ReturnType<typeof getColumns>>
+                        >
+                      }
+                      group={user.member[Number(group)].group}
+                    />
+                  );
+                })}
             </HStack>
           </DragDropContext>
         </VStack>

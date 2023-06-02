@@ -75,7 +75,10 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     let members = checkedMembers.map((checked, index) => {
       if (checked) return group.members[index].user;
     });
+    console.log("CreateTaskModal");
+    console.log(members);
     members = members.filter((val) => val) as User[];
+    console.log(members);
 
     const {
       data: { group: newGroup },

@@ -105,8 +105,6 @@ export const onDragEnd = (
         | "todo"
         | "doing"
         | "done";
-
-      task.id = index + _index + 1;
     });
   });
 

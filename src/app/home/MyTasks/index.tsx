@@ -87,7 +87,6 @@ export const MyTasks = () => {
             onDragEnd={(result) =>
               onDragEnd(
                 result,
-                user.id,
                 columns!,
                 setColumns as Dispatch<
                   SetStateAction<ReturnType<typeof getColumns>>

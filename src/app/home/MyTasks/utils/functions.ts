@@ -53,7 +53,6 @@ export type TSetColumns = Dispatch<SetStateAction<TColumns>>;
 
 export const onDragEnd = (
   result: DropResult,
-  userId: number,
   columns: TColumns,
   setColumns: TSetColumns
 ) => {
@@ -105,8 +104,6 @@ export const onDragEnd = (
         | "todo"
         | "doing"
         | "done";
-
-      task.id = index + _index + 1;
     });
   });
 
@@ -116,7 +113,7 @@ export const onDragEnd = (
     ...newColumns[2].tasks,
   ];
 
-  axios.post("/api/res/updateTasks", { userId, tasks });
+  axios.post("/api/res/updateTasks", { tasks });
 };
 
 export const getProgress = (columns: TColumns) => {

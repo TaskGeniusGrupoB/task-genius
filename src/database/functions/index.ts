@@ -1,8 +1,5 @@
 import { prisma } from "../prisma";
 
-// rodar prisma generate
-// criar funções de integração de group tasks
-
 export interface User {
   id: number;
   email: string;
@@ -133,7 +130,11 @@ export const addGroupMember = async (userId: number, groupId: number) => {
       include: {
         group: {
           include: {
-            members: true,
+            members: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
@@ -177,27 +178,21 @@ export const addTask = async ({
 };
 
 export const updateTasks = async ({
-  userId,
   tasks,
 }: {
   userId: number;
   tasks: Task[];
 }): Promise<void> => {
-  await prisma.task.deleteMany({
-    where: {
-      userId,
-    },
-  });
-
-  const createTasks = tasks.map((task) => ({
-    ...task,
-    userId,
-  }));
-
-  await prisma.task.createMany({
-    data: createTasks,
-    skipDuplicates: true,
-  });
+  await Promise.all(
+    tasks.map(async (task) => {
+      await prisma.task.update({
+        where: { id: task.id },
+        data: {
+          status: task.status,
+        },
+      });
+    })
+  );
 };
 
 export const deleteTaskById = async (taskId: number) => {
@@ -243,7 +238,11 @@ export const addGroupTask = async ({
       },
     },
     include: {
-      tasks: true,
+      tasks: {
+        include: {
+          members: true,
+        },
+      },
     },
   });
 
@@ -257,22 +256,16 @@ export const updateGroupTasks = async ({
   groupId: number;
   tasks: GroupTask[];
 }): Promise<void> => {
-  await prisma.groupTask.deleteMany({
-    where: {
-      groupId,
-    },
-  });
-
-  const createTasks = tasks.map((task) => ({
-    ...task,
-    groupId,
-    group: undefined,
-  }));
-
-  await prisma.groupTask.createMany({
-    data: createTasks,
-    skipDuplicates: true,
-  });
+  await Promise.all(
+    tasks.map(async (task) => {
+      await prisma.groupTask.update({
+        where: { id: task.id },
+        data: {
+          status: task.status,
+        },
+      });
+    })
+  );
 };
 
 export const deleteGroupTaskById = async (
