@@ -65,6 +65,9 @@ export const Sidebar: React.FC = () => {
             <NavLink iconSrc="/icons/calendar.svg" href="/home/calendar">
               Calendário
             </NavLink>
+            <NavLink iconSrc="/icons/User.svg" href="/home/my-profile">
+              Meu Perfil
+            </NavLink>
           </VStack>
         </VStack>
 

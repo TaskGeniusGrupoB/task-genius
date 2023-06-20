@@ -80,7 +80,7 @@ export const SignUp: React.FC = () => {
       minH="100vh"
       align="center"
       justify="center"
-      bg="primary"
+      bg="linear-gradient(107.2deg, #9CBAFF 0.51%, rgba(235, 241, 255, 0) 100%)"
     >
       <VStack
         as="form"
