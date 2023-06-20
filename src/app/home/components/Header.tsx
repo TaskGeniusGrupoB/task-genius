@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import {
   HStack,
@@ -19,6 +19,8 @@ import { useAuth } from "@/hooks/useAuth";
 import type { Task } from "@/database/functions";
 
 const getDeadlineNotifications = (_tasks: Task[]): Notification[] => {
+  if (!_tasks.length) return [];
+
   const tasks = _tasks.filter(({ deadline }) => {
     const today = new Date();
     const maxDate = new Date();
@@ -46,13 +48,18 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
   const { user, notifications } = useAuth();
 
   const [_notifications, setNotifications] = useState<Notification[]>();
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     if (user && notifications) {
       setNotifications([
         ...notifications,
-        ...getDeadlineNotifications(user.tasks),
+        ...getDeadlineNotifications(
+          !!user.tasks && !!user.tasks.length ? user.tasks : []
+        ),
       ]);
+
+      setIsOpen((prev) => !prev);
     }
   }, [user, notifications]);
 
@@ -71,7 +78,13 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
       </Heading>
 
       <HStack spacing={4} align="center">
-        {_notifications && <NotificationsMenu notifications={_notifications} />}
+        {_notifications && (
+          <NotificationsMenu
+            notifications={_notifications}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+          />
+        )}
 
         <HStack spacing={4}>
           <Image src="/icons/Person.png" />
@@ -181,11 +194,17 @@ export type Notification = {
 
 interface NotificationsMenuProps {
   notifications: Notification[];
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const NotificationsMenu = ({ notifications }: NotificationsMenuProps) => {
+const NotificationsMenu = ({
+  notifications,
+  isOpen,
+  setIsOpen,
+}: NotificationsMenuProps) => {
   return (
-    <ChakraMenu>
+    <ChakraMenu isOpen={isOpen}>
       <MenuButton
         as={IconButton}
         icon={<Image src="/icons/Email.png" />}
@@ -195,6 +214,7 @@ const NotificationsMenu = ({ notifications }: NotificationsMenuProps) => {
         aria-label="menu"
         _hover={{ bgColor: "#EBF1FF" }}
         _active={{ bgColor: "#EBF1FF" }}
+        onClick={() => setIsOpen((prev) => !prev)}
       />
 
       <MenuList
